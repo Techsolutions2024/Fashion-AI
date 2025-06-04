@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Virtual Try-On - Cách Mạng Thời Trang</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: slideInUp 1s ease-out;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            animation: slideInUp 1s ease-out 0.3s both;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #ff6b6b;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            animation: slideInUp 1s ease-out 0.6s both;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.6);
+            background: #ff5252;
+        }
+        
+        /* Demo Section */
+        .demo-section {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+        
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .demo-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .demo-visual {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .try-on-demo {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .model-photo, .garment-photo, .result-photo {
+            width: 150px;
+            height: 200px;
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #666;
+            border: 2px dashed #90caf9;
+            transition: all 0.3s ease;
+        }
+        
+        .plus-sign {
+            font-size: 2rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .arrow {
+            font-size: 2rem;
+            color: #ff6b6b;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .interactive-demo {
+            margin-top: 30px;
+        }
+        
+        .upload-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #333;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:nth-child(2) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .feature-card:nth-child(3) {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        /* Benefits Section */
+        .benefits {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+        
+        .benefits h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #333;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .benefit-item {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .benefit-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        /* Stats Section */
+        .stats {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .stat-item h3 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #ff6b6b;
+        }
+        
+        /* CTA Section */
+        .final-cta {
+            padding: 80px 0;
+            background: #333;
+            color: white;
+            text-align: center;
+        }
+        
+        .final-cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .final-cta p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .demo-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .try-on-demo {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .model-photo, .garment-photo, .result-photo {
+                width: 120px;
+                height: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>🚀 Cách Mạng Trải Nghiệm Mua Sắm</h1>
+                <p>Công nghệ AI Thử Đồ Ảo tiên tiến nhất - Tăng doanh số 300%, Giảm tỷ lệ trả hàng 85%</p>
+                <a href="#demo" class="cta-button">Xem Demo Ngay</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="demo-section">
+        <div class="container">
+            <div class="demo-container">
+                <div class="demo-content">
+                    <h2>💡 Thử Đồ Ảo Siêu Thực</h2>
+                    <p><strong>Dựa trên công nghệ OOTDiffusion</strong> - mô hình AI tiên tiến nhất hiện tại</p>
+                    <ul style="margin: 20px 0; font-size: 1.1rem;">
+                        <li>✅ Thử đồ tức thì chỉ trong 10-15 giây</li>
+                        <li>✅ Độ chính xác cao với mọi loại trang phục</li>
+                        <li>✅ Phù hợp với mọi dáng người</li>
+                        <li>✅ Tích hợp dễ dàng vào website</li>
+                    </ul>
+                </div>
+                
+                <div class="demo-visual">
+                    <h3>🎯 Quy Trình Thử Đồ AI</h3>
+                    <div class="try-on-demo">
+                        <div class="model-photo">
+                            📸<br>Ảnh Khách Hàng
+                        </div>
+                        <div class="plus-sign">+</div>
+                        <div class="garment-photo">
+                            👕<br>Sản Phẩm
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="result-photo" style="background: linear-gradient(45deg, #4caf50, #8bc34a);">
+                            ✨<br>Kết Quả<br>Hoàn Hảo
+                        </div>
+                    </div>
+                    
+                    <div class="interactive-demo">
+                        <button class="upload-btn" onclick="simulateUpload('model')">📤 Tải Ảnh Mẫu</button>
+                        <button class="upload-btn" onclick="simulateUpload('garment')">👔 Chọn Sản Phẩm</button>
+                        <button class="upload-btn" onclick="generateResult()" style="background: #ff6b6b;">🎨 Tạo Kết Quả</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2>🎯 Tính Năng Vượt Trội</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Thông Minh</h3>
+                    <p>Sử dụng công nghệ Diffusion Model tiên tiến, cho kết quả siêu thực và chính xác</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Tốc Độ Ánh Sáng</h3>
+                    <p>Xử lý và tạo kết quả chỉ trong 10-15 giây, trải nghiệm mượt mà cho khách hàng</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Chất Lượng 4K</h3>
+                    <p>Hình ảnh thử đồ sắc nét, chi tiết, bảo toàn hoàn toàn đặc điểm sản phẩm</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits">
+        <div class="container">
+            <h2>💎 Lợi Ích Doanh Nghiệp</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-number">300%</div>
+                    <h4>Tăng Doanh Số</h4>
+                    <p>Khách hàng tự tin mua hàng hơn khi đã thử đồ ảo</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-number">85%</div>
+                    <h4>Giảm Trả Hàng</h4>
+                    <p>Khách hàng biết chính xác sản phẩm trước khi mua</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-number">150%</div>
+                    <h4>Tăng Thời Gian Lưu Trú</h4>
+                    <p>Trải nghiệm thú vị khiến khách hàng ở lại lâu hơn</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-number">70%</div>
+                    <h4>Cải Thiện Chuyển Đổi</h4>
+                    <p>Từ xem sản phẩm đến quyết định mua hàng nhanh hơn</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <h2>📊 Những Con Số Ấn Tượng</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>1M+</h3>
+                    <p>Lượt thử đồ thành công</p>
+                </div>
+                
+                <div class="stat-item">
+                    <h3>500+</h3>
+                    <p>Thương hiệu tin tưởng</p>
+                </div>
+                
+                <div class="stat-item">
+                    <h3>99.9%</h3>
+                    <p>Thời gian hoạt động</p>
+                </div>
+                
+                <div class="stat-item">
+                    <h3>24/7</h3>
+                    <p>Hỗ trợ kỹ thuật</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>🚀 Sẵn Sàng Cách Mạng Cửa Hàng Của Bạn?</h2>
+            <p>Tham gia cùng hàng trăm thương hiệu thời trang đã tăng trường thành công với AI</p>
+            <a href="#contact" class="cta-button" style="margin: 0 10px;">📞 Liên Hệ Ngay</a>
+            <a href="#trial" class="cta-button" style="background: transparent; border: 2px solid #ff6b6b;">🎯 Dùng Thử 7 Ngày Miễn Phí</a>
+        </div>
+    </section>
+
+    <script>
+        // Simulate interactive demo
+        function simulateUpload(type) {
+            const button = event.target;
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '⏳ Đang tải...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.innerHTML = '✅ ' + (type === 'model' ? 'Đã tải ảnh' : 'Đã chọn sản phẩm');
+                button.style.background = '#4caf50';
+            }, 1500);
+        }
+        
+        function generateResult() {
+            const button = event.target;
+            button.innerHTML = '🎨 Đang xử lý...';
+            button.disabled = true;
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                button.innerHTML = '🎉 Hoàn thành!';
+                button.style.background = '#4caf50';
+                
+                // Show result animation
+                const resultPhoto = document.querySelector('.result-photo');
+                resultPhoto.style.transform = 'scale(1.1)';
+                resultPhoto.style.background = 'linear-gradient(45deg, #ffd700, #ff6b6b)';
+                resultPhoto.innerHTML = '🌟<br>Kết Quả<br>Tuyệt Vời!';
+                
+                setTimeout(() => {
+                    resultPhoto.style.transform = 'scale(1)';
+                }, 500);
+                
+            }, 3000);
+        }
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements for animation
+        document.querySelectorAll('.feature-card, .benefit-item, .stat-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
